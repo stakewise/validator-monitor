@@ -104,7 +104,6 @@ func chunkedValidatorBalances(stateID int, validatorPubkeys []string) (map[strin
 }
 
 // getEpoch return current and previous epoch slots
-// options:
 func getEpoch() (int, int, error) {
 	var resp FinalityCheckpoints
 	addr := fmt.Sprintf("/eth/v1/beacon/states/head/finality_checkpoints")
@@ -124,8 +123,42 @@ func getEpoch() (int, int, error) {
 		return 0, 0, err
 	}
 
-	currentSlot := currentEpoch * cfg.SLOTS_PER_EPOCH
-	previousSlot := (currentEpoch - 1) * cfg.SLOTS_PER_EPOCH
+	slotsPerEpoch, err := slotsPerEpoch()
+	if err != nil {
+		log.Error().Msgf("Can't get slots per epoch %s", err)
+		return 0, 0, err
+	}
+
+	currentSlot := currentEpoch * slotsPerEpoch
+	previousSlot := (currentEpoch - 1) * slotsPerEpoch
 
 	return currentSlot, previousSlot, nil
+}
+
+// slotsPerEpoch
+//
+func slotsPerEpoch() (int, error) {
+	var resp struct {
+		Data struct {
+			SlotsPerEpoch string `json:"SLOTS_PER_EPOCH"`
+		} `json:"data"`
+	}
+	addr := fmt.Sprintf("/eth/v1/config/spec")
+
+	_, err := ethClient.client.R().
+		SetResult(&resp).
+		Get(addr)
+
+	if err != nil {
+		log.Error().Msgf("Can't get epoch from beacon node %s", err)
+		return 0, err
+	}
+
+	slotsPerEpoch, err := strconv.Atoi(resp.Data.SlotsPerEpoch)
+	if err != nil {
+		log.Error().Msgf("Can't parse SLOTS_PER_EPOCH %s", err)
+		return 0, err
+	}
+
+	return slotsPerEpoch, nil
 }

@@ -37,4 +37,3 @@ go build .
 | GRAPH_NODE_URL           | Graph Node Endpoint                   | Yes       | https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet |
 | BEACON_NODE_URL            | ETH2 Node Endpoint                 | Yes       | -                                                                       |
 | OPERATOR_WALLETS         | List of operators wallets              | Yes       | 0x6a5b7d2,0x6a5b7d3,0x6a5b7d4 ...                                                                       |                                                              |
-| SLOTS_PER_EPOCH | Slots per epoch. ETH=32 Gnosis=16 | No | 32 |
