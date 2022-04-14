@@ -16,7 +16,7 @@ func GetPubkeys(wallet string) ([]string, error) {
 	var response ValidatorID
 	for {
 		_, err := gqlClient.client.R().
-			SetBody(`{"query":"{\n  validators(first:1000, where: {operator: \"` + wallet + `\", id_gt: \"` + lastId + `\"}) {\n    id\n  }\n}","variables":{}}`).
+			SetBody(`{"query":"{\n  validators(first:1000, where: {operator: \"` + strings.ToLower(wallet) + `\", id_gt: \"` + lastId + `\"}) {\n    id\n  }\n}","variables":{}}`).
 			SetResult(&response).
 			Post("")
 		if err != nil || len(response.Data.Validators) < 1 {
@@ -117,7 +117,7 @@ func getEpoch() (int, int, error) {
 		return 0, 0, err
 	}
 
-	currentEpoch, err := strconv.Atoi(resp.Data.PreviousJustified.Epoch)
+	currentEpoch, err := strconv.Atoi(resp.Data.Finalized.Epoch)
 	if err != nil {
 		log.Error().Err(err)
 		return 0, 0, err
