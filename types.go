@@ -8,6 +8,12 @@ type ValidatorID struct {
 	} `json:"data"`
 }
 
+type ValidatorIndex struct {
+	Data []struct {
+		Index string `json:"index"`
+	} `json:"data"`
+}
+
 type ValidatorBalance struct {
 	Data []struct {
 		Index   string `json:"index"`

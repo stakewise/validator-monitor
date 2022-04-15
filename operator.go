@@ -13,27 +13,54 @@ import (
 func GetPubkeys(wallet string) ([]string, error) {
 	var pubkeys []string
 	var lastId string
-	var response ValidatorID
+	var resp ValidatorID
 	for {
 		_, err := gqlClient.client.R().
 			SetBody(`{"query":"{\n  validators(first:1000, where: {operator: \"` + strings.ToLower(wallet) + `\", id_gt: \"` + lastId + `\"}) {\n    id\n  }\n}","variables":{}}`).
-			SetResult(&response).
+			SetResult(&resp).
 			Post("")
-		if err != nil || len(response.Data.Validators) < 1 {
+		if err != nil || len(resp.Data.Validators) < 1 {
 			log.Error().Msgf("Can't get public keys from graph node %s", err)
 			return nil, err
 		}
-		for _, v := range response.Data.Validators {
+		for _, v := range resp.Data.Validators {
 			pubkeys = append(pubkeys, v.ID)
 		}
-		if len(response.Data.Validators) >= 1000 {
+		if len(resp.Data.Validators) >= 1000 {
 			lastId = pubkeys[len(pubkeys)-1]
 		} else {
 			break
 		}
 	}
 
-	return pubkeys, nil
+	chunkSize := 100
+	var indexes []string
+
+	for i := 0; i < len(pubkeys); i += chunkSize {
+		end := i + chunkSize
+
+		if end > len(pubkeys) {
+			end = len(pubkeys)
+		}
+
+		addr := fmt.Sprintf("/eth/v1/beacon/states/head/validators?id=%s", strings.Join(pubkeys[i:end], ","))
+
+		var resp ValidatorIndex
+		_, err := ethClient.client.R().
+			SetResult(&resp).
+			Get(addr)
+		if err != nil {
+			log.Error().Msgf("Can't convert public keys to indexes %s", err)
+			return nil, err
+		}
+
+		for i := 0; i < len(resp.Data); i++ {
+			index := resp.Data[i].Index
+			indexes = append(indexes, index)
+		}
+	}
+
+	return indexes, nil
 }
 
 // ValidatorBalances provides the validator balances for a given state.
