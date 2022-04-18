@@ -38,13 +38,11 @@ func GetPubkeys(wallet string) ([]string, error) {
 
 	for i := 0; i < len(pubkeys); i += chunkSize {
 		end := i + chunkSize
-
 		if end > len(pubkeys) {
 			end = len(pubkeys)
 		}
 
 		addr := fmt.Sprintf("/eth/v1/beacon/states/head/validators?id=%s", strings.Join(pubkeys[i:end], ","))
-
 		var resp ValidatorIndex
 		_, err := ethClient.client.R().
 			SetResult(&resp).
@@ -55,8 +53,9 @@ func GetPubkeys(wallet string) ([]string, error) {
 		}
 
 		for i := 0; i < len(resp.Data); i++ {
-			index := resp.Data[i].Index
-			indexes = append(indexes, index)
+			if resp.Data[i].Status == "active_ongoing" {
+				indexes = append(indexes, resp.Data[i].Index)
+			}
 		}
 	}
 
@@ -68,6 +67,10 @@ func GetPubkeys(wallet string) ([]string, error) {
 // validatorPubkeys is a list of validator pubkeys to restrict the returned values.  If no validators are supplied no filter
 // will be applied.
 func ValidatorBalances(stateID int, validatorPubkeys []string) (map[string]int, error) {
+	if len(validatorPubkeys) <= 1 {
+		log.Error().Msg("No active validators")
+		return nil, nil
+	}
 	if len(validatorPubkeys) > cfg.INDEX_CHUNCK_SIZE {
 		return chunkedValidatorBalances(stateID, validatorPubkeys)
 	}
@@ -77,7 +80,7 @@ func ValidatorBalances(stateID int, validatorPubkeys []string) (map[string]int, 
 	if len(validatorPubkeys) != 0 {
 		ids := make([]string, len(validatorPubkeys))
 		for i := range validatorPubkeys {
-			ids[i] = fmt.Sprintf("%s", validatorPubkeys[i])
+			ids[i] = validatorPubkeys[i]
 		}
 		url = fmt.Sprintf("%s?id=%s", url, strings.Join(ids, ","))
 	}
