@@ -10,7 +10,8 @@ type ValidatorID struct {
 
 type ValidatorIndex struct {
 	Data []struct {
-		Index string `json:"index"`
+		Index  string `json:"index"`
+		Status string `json:"status"`
 	} `json:"data"`
 }
 
