@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -45,7 +44,6 @@ func ValidatorEffectiveness() error {
 
 		for k, v := range currentBalance {
 			if oldBalance, ok := previousBalance[k]; ok {
-				fmt.Printf("Current Balance: %d, Previous Balance: %d\n", v, oldBalance)
 				if v <= (oldBalance - 5000) {
 					validatorStatus.WithLabelValues(wallet, k).Set(0)
 				} else {

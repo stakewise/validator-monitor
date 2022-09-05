@@ -18,7 +18,7 @@ func NewRestClient(address string) *RestClient {
 	client := resty.New()
 
 	client.SetTimeout(1 * time.Minute)
-	client.SetHostURL(address)
+	client.SetBaseURL(address)
 	client.SetHeader("Content-Type", "application/json")
 
 	log.Info().Msgf("Initialize new client connected to: %s", address)
