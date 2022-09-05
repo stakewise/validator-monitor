@@ -136,7 +136,7 @@ func chunkedValidatorBalances(stateID int, validatorPubkeys []string) (map[strin
 // getEpoch return current and previous epoch slots
 func getEpoch() (int, int, error) {
 	var resp FinalityCheckpoints
-	addr := fmt.Sprintf("/eth/v1/beacon/states/head/finality_checkpoints")
+	addr := "/eth/v1/beacon/states/head/finality_checkpoints"
 
 	_, err := ethClient.client.R().
 		SetResult(&resp).
@@ -166,14 +166,13 @@ func getEpoch() (int, int, error) {
 }
 
 // slotsPerEpoch
-//
 func slotsPerEpoch() (int, error) {
 	var resp struct {
 		Data struct {
 			SlotsPerEpoch string `json:"SLOTS_PER_EPOCH"`
 		} `json:"data"`
 	}
-	addr := fmt.Sprintf("/eth/v1/config/spec")
+	addr := "/eth/v1/config/spec"
 
 	_, err := ethClient.client.R().
 		SetResult(&resp).

@@ -13,7 +13,7 @@ import (
 var cfg struct {
 	BEACON_NODE_URL   string `env:"BEACON_NODE_URL,default=http://localhost:5052"`
 	GRAPH_NODE_URL    string `env:"GRAPH_NODE_URL,default=https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"`
-	INDEX_CHUNCK_SIZE int    `env:"INDEX_CHUNCK_SIZE,default=800"`
+	INDEX_CHUNCK_SIZE int    `env:"INDEX_CHUNCK_SIZE,default=500"`
 	OPERATOR_WALLETS  string `env:"OPERATOR_WALLETS,default=0x102f792028a56f13d6d99ed4ec8a6125de98582a"`
 	BIND_ADDRESS      string `env:"BIND_ADDRESS,default=0.0.0.0:9000"`
 }
